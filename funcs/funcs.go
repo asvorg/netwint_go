@@ -45,3 +45,42 @@ func extractAvgTime(output string) (float64, error) {
 
     return avgTime, nil
 }
+
+/*
+func PerformPingRoutine(ip string, count int) (time.Duration, float64, float64) {
+    var totalRTT time.Duration
+    var jitterSum float64
+    var lastRTT time.Duration
+    var packetLossCount int
+
+    for i := 0; i < count; i++ {
+        if i == 1 {
+            i = i - 1
+        }
+        start := time.Now()
+        conn, err := net.DialTimeout("tcp", ip+":80", 1*time.Second)
+        if err != nil {
+            packetLossCount++
+            continue
+        }
+        conn.Close()
+
+        rtt := time.Since(start)
+        totalRTT += rtt
+
+        if i > 0 {
+            jitter := float64(rtt-lastRTT) / float64(time.Millisecond)
+            jitterSum += jitter
+        }
+        lastRTT = rtt
+
+        time.Sleep(1 * time.Second) // Interval between pings
+    }
+
+    avgRTT := time.Duration(float64(totalRTT) / float64(count))
+    avgJitter := jitterSum / float64(count-1)
+    packetLoss := float64(packetLossCount) / float64(count) * 100
+
+    return avgRTT, avgJitter, packetLoss
+}
+*/
