@@ -3,12 +3,10 @@ package testers
 import (
     "fmt"
     "netwint_go/helpers"
-    "netwint_go/scan_func"
 )
 
-type Testers struct{}
-
-func ResolveAndPing() {
+// TestDomainResolution resolves a list of domains and prints their IP addresses.
+func TestDomainResolution() {
     domains := []string{
         "www.google.com",
         "www.facebook.com",
@@ -22,40 +20,14 @@ func ResolveAndPing() {
         "www.netflix.com",
         "www.github.com",
         "www.stackoverflow.com",
-        "www.iltalehti.fi",
     }
-
-    helper := helpers.Helpers{}
-    scanner := scanfunc.ScanFunc{}
 
     for _, domain := range domains {
-        ip, err := helper.ResolveDomain(domain)
+        ip, err := helpers.ResolveDomain(domain)
         if err != nil {
-            fmt.Printf("Could not resolve the domain name: %s\n", domain)
-            continue
+            fmt.Println("Error resolving domain:", domain, "-", err)
+        } else {
+            fmt.Println(domain, "resolves to IP:", ip)
         }
-
-        fmt.Printf("%s resolves to IP: %s\n", domain, ip)
-
-        times, err := helper.Ping(ip)
-        if err != nil {
-            fmt.Printf("Error pinging %s: %s\n", ip, err)
-            continue
-        }
-
-        fmt.Printf("Ping times to %s: %v\n", ip, times)
-        avgTime := avg(times)
-        fmt.Printf("Average time: %.2f ms\n\n", avgTime)
-
-        fmt.Printf("Scanning ports on %s...\n", ip)
-        scanner.SimpleScanMostCommonPorts(ip)
     }
-}
-
-func avg(times []float64) float64 {
-    sum := 0.0
-    for _, time := range times {
-        sum += time
-    }
-    return sum / float64(len(times))
 }
