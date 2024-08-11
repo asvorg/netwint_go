@@ -15,7 +15,10 @@ func printHelp() {
     fmt.Println("  ping [ip] [count]      Ping an IP address and display performance metrics")
     fmt.Println("  scan [ip] [minPort] [maxPort]  Scan ports on an IP address")
     fmt.Println("  service [ip] [port]    Detect service running on a port")
+	fmt.Println("  map [ipRange]          Map network by discovering active hosts in the given IP range")
+	fmt.Println("  banner [ip] [port]     Grab the banner from a port on the given IP address")
     fmt.Println("  help                   Display this help message")
+	
 }
 
 func main() {
@@ -114,8 +117,31 @@ func main() {
         service := funcs.DetectService(ip, port)
         fmt.Printf("Service on port %d: %s\n", port, service)
 
-    case "help":
+	case "map":
+        if len(os.Args) < 3 {
+            fmt.Println("Usage: map [ipRange]")
+            return
+        }
+        ipRange := os.Args[2]
+        funcs.DiscoverHosts(ipRange)
+	
+	case "banner":
+        if len(os.Args) < 4 {
+            fmt.Println("Usage: banner [ip] [port]")
+            return
+        }
+        ip := os.Args[2]
+        port, _ := strconv.Atoi(os.Args[3])
+        banner, err := funcs.GrabBanner(ip, port)
+        if err != nil {
+            fmt.Println("Error grabbing banner:", err)
+            return
+        }
+        fmt.Printf("Banner for port %d: %s\n", port, banner)
+
+	case "help":
         printHelp()
+
 
     default:
         fmt.Println("Unknown command:", command)

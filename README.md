@@ -14,12 +14,5 @@ A simple network intelligence tool written in Go that provides functionality for
 ## Prerequisites
 
 - Go 1.18 or later
-- Basic knowledge of Go programming and networking concepts
 
-## Installation
 
-1. Clone the repository:
-
-   ```bash
-   git clone git@github.com:<your-username>/netwint_go.git
-   cd netwint_go
