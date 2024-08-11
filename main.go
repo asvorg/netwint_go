@@ -17,6 +17,7 @@ func printHelp() {
     fmt.Println("  service [ip] [port]    Detect service running on a port")
 	fmt.Println("  map [ipRange]          Map network by discovering active hosts in the given IP range")
 	fmt.Println("  banner [ip] [port]     Grab the banner from a port on the given IP address")
+	fmt.Println("  cert [ip] [port]       Retrieve and display SSL/TLS certificate details")
     fmt.Println("  help                   Display this help message")
 	
 }
@@ -44,6 +45,19 @@ func main() {
             return
         }
         fmt.Println("IP address:", ip)
+	
+	case "cert":
+        if len(os.Args) < 4 {
+            fmt.Println("Usage: cert [ip] [port]")
+            return
+        }
+        ip := os.Args[2]
+        port, err := strconv.Atoi(os.Args[3])
+        if err != nil {
+            fmt.Println("Invalid port:", err)
+            return
+        }
+        funcs.GetTLSCert(ip, port)
         
     case "ping":
         if len(os.Args) < 4 {
@@ -59,53 +73,72 @@ func main() {
         avgRTT, jitter, packetLoss := funcs.PerformPing(ip, count)
         fmt.Printf("Average RTT: %.2f ms\nJitter: %.2f ms\nPacket Loss: %.2f%%\n", avgRTT.Seconds()*1000, jitter, packetLoss)
         
-    case "scan":
+	case "scan":
         if len(os.Args) < 5 {
-            fmt.Println("Usage: scan [ip] [minPort] [maxPort]")
+            fmt.Println("Usage: scan [ip] [mode] [minPort] [maxPort]")
             return
         }
         ip := os.Args[2]
-		ports := []int{
-			20,    // FTP Data Transfer
-			21,    // FTP Command
-			22,    // SSH
-			23,    // Telnet
-			25,    // SMTP
-			53,    // DNS
-			67,    // DHCP Server
-			68,    // DHCP Client
-			80,    // HTTP
-			110,   // POP3
-			143,   // IMAP
-			161,   // SNMP
-			162,   // SNMP Trap
-			194,   // IRC
-			443,   // HTTPS
-			465,   // SMTPS
-			514,   // Syslog
-			587,   // SMTP (Submission)
-			631,   // IPP (Internet Printing Protocol)
-			993,   // IMAPS
-			995,   // POP3S
-			1080,  // SOCKS Proxy
-			1433,  // Microsoft SQL Server
-			3306,  // MySQL
-			3389,  // RDP (Remote Desktop Protocol)
-			5432,  // PostgreSQL
-			5900,  // VNC
-			6379,  // Redis
-			6667,  // IRC
-			8080,  // HTTP Alternate
-			8443,  // HTTPS Alternate
-			9200,  // Elasticsearch
-			9300,  // Elasticsearch Transport
-			27017, // MongoDB
-			5000,  // UPnP
-			9000,  // Various services
-			49152, // Dynamic/Private Ports
-			65535, // Dynamic/Private Ports
-		}	
-		funcs.ScanPorts(ip, ports)
+        mode := os.Args[3]
+        minPort, err := strconv.Atoi(os.Args[4])
+        if err != nil {
+            fmt.Println("Invalid minPort:", err)
+            return
+        }
+        maxPort, err := strconv.Atoi(os.Args[5])
+        if err != nil {
+            fmt.Println("Invalid maxPort:", err)
+            return
+        }
+
+        switch mode {
+        case "list":
+            ports := []int{
+                20,    // FTP Data Transfer
+                21,    // FTP Command
+                22,    // SSH
+                23,    // Telnet
+                25,    // SMTP
+                53,    // DNS
+                67,    // DHCP Server
+                68,    // DHCP Client
+                80,    // HTTP
+                110,   // POP3
+                143,   // IMAP
+                161,   // SNMP
+                162,   // SNMP Trap
+                194,   // IRC
+                443,   // HTTPS
+                465,   // SMTPS
+                514,   // Syslog
+                587,   // SMTP (Submission)
+                631,   // IPP (Internet Printing Protocol)
+                993,   // IMAPS
+                995,   // POP3S
+                1080,  // SOCKS Proxy
+                1433,  // Microsoft SQL Server
+                3306,  // MySQL
+                3389,  // RDP (Remote Desktop Protocol)
+                5432,  // PostgreSQL
+                5900,  // VNC
+                6379,  // Redis
+                6667,  // IRC
+                8080,  // HTTP Alternate
+                8443,  // HTTPS Alternate
+                9200,  // Elasticsearch
+                9300,  // Elasticsearch Transport
+                27017, // MongoDB
+                5000,  // UPnP
+                9000,  // Various services
+                49152, // Dynamic/Private Ports
+                65535, // Dynamic/Private Ports
+            }	
+            funcs.ScanPorts(ip, ports)
+        case "range":
+            funcs.ScanPortsRange(ip, minPort, maxPort)
+        default:
+            fmt.Println("Invalid mode. Use 'list' or 'range'.")
+        }
 
     case "service":
         if len(os.Args) < 4 {
